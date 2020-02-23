@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    command: python /code/manage.py runserver 0.0.0.0:8000
+    environment:
+      DEBUG: 1
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: .
+    command: python /code/manage.py rqworker default
+    environment:
+      DEBUG: 1
+    volumes:
+      - .:/code
+    depends_on:
+      - web
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: djheroku
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:latest
+
+volumes:
+  pgdata:
