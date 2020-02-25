@@ -3,11 +3,11 @@ version: '3.7'
 services:
   web:
     build: .
-    command: python /code/manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       DEBUG: 1
     volumes:
-      - .:/code
+      - .:/app
     ports:
       - 8000:8000
     depends_on:
@@ -16,11 +16,11 @@ services:
 
   worker:
     build: .
-    command: python /code/manage.py rqworker default
+    command: python manage.py rqworker default
     environment:
       DEBUG: 1
     volumes:
-      - .:/code
+      - .:/app
     depends_on:
       - web
 
