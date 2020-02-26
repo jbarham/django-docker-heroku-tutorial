@@ -1,4 +1,0 @@
--r base.txt
-
-psycopg2-binary
-django-debug-toolbar
