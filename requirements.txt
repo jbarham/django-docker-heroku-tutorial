@@ -4,4 +4,5 @@ dj-database-url
 django-redis-cache
 django-rq
 django-debug-toolbar
+whitenoise
 gunicorn
