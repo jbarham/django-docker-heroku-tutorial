@@ -82,8 +82,7 @@ WSGI_APPLICATION = 'djheroku.wsgi.application'
 # See docs at https://github.com/jacobian/dj-database-url#dj-database-url.
 
 DATABASES = {
-    # If DATABASE_URL environment variable isn't set.
-    # use Docker Compose Postgres database.
+    # If DATABASE_URL environment variable isn't set, use Docker Compose Postgres database.
     'default': dj_database_url.config(
         default='postgres://postgres:postgres@db:5432/djheroku',
         conn_max_age=600,
@@ -139,6 +138,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
+        # By default use Docker Compose Redis instance.
         'LOCATION': os.getenv('REDIS_URL', 'redis:6379'),
     },
 }

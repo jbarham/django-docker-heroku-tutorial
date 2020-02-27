@@ -4,7 +4,7 @@ FROM python:3.6-slim
 # Install psql so that "python manage.py dbshell" works
 RUN apt-get update -qq && apt-get install -y postgresql-client
 
-# Set environment varibles
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
