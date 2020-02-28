@@ -21,6 +21,20 @@ Docker, and the benefits of containerization more generally, but would benefit
 from seeing a simple but real-world Django application configured for
 development in Docker, and, as a bonus, deployment to Heroku.
 
+## Contents
+
+- [Developing in Docker](#developing-in-docker)
+  - [Quick Start](#quick-start)
+  - [Django Dockerfile](#django-dockerfile)
+  - [Docker Compose Services](#docker-compose-services)
+  - [Running Django Debug Toolbar in Docker Compose](#running-django-debug-toolbar-in-docker-compose)
+- [Deploying to Heroku](#deploying-to-heroku)
+  - [Quick Start](#quick-start-1)
+  - [Heroku Procfile](#heroku-procfile)
+  - [Why Deploy to Heroku](#why-deploy-to-heroku)
+  - [Why Not Deploy to Heroku](#why-not-deploy-to-heroku)
+- [Further Reading](#further-reading)
+
 ## Developing in Docker
 
 ### Quick Start
@@ -122,7 +136,7 @@ from your configuration.
 Our Docker Compose configuration file, [`docker-compose.yml`](./docker-compose.yml),
 defines four services, `web`, `worker`, `db` and `redis`, each of which runs in
 a separate Docker container. (Note that the internal hostname for each service
-is same as the service name. So to connect to the Redis server from Django we
+is the same as the service name. So to connect to the Redis server from Django we
 use `redis:6379` as the *hostname:port* pair.)
 
 Taking each service in turn:
@@ -247,23 +261,79 @@ Create a new Heroku Postgres database:
 heroku addons:create heroku-postgresql:hobby-dev
 ```
 
+Once Heroku has finished creating the Postgres database, it will create the
+environment variable `DATABASE_URL` which contains the login credentials to the
+database. View the Heroku app's environment by running `heroku config`.
+
 Create a new Heroku Redis server:
 
 ```
 heroku addons:create heroku-redis:hobby-dev
 ```
 
-Upload our app to Heroku:
+Similarly Heroku will create an environment variable `REDIS_URL` once it's
+finished creating the Redis instance.
+
+Upload and deploy our app to Heroku:
 
 ```
 git push heroku master
 ```
 
-Start a background task worker dyno:
+This will take some time as Heroku builds the app and deploys it to a web dyno,
+comparable to a Docker container.
+
+You should now able to view the Django app running in Heroku by running
+`heroku open`.
+
+The background task runner isn't run by default so spin one up:
 
 ```
 heroku ps:scale worker=1
 ```
+
+Shut down the app in Heroku by running:
+
+```
+heroku ps:scale web=0 worker=0
+```
+
+Note that shutting down the app only stops the app's `web` and `worker` dynos.
+The Postgres database and Redis server that we created for the app keep running.
+
+To permanently delete the Heroku app, including the Postgres database and Redis
+server, run `heroku apps:destroy`.
+
+### Heroku Procfile
+
+Our app directory already contains a top-level `requirements.txt` file, which
+tells Heroku that this is a Python app and it should `pip` install the packages
+in the requirements file when it builds the app.
+
+How our app should be run after it's been built is defined in a `Procfile`:
+
+```
+release: python manage.py migrate
+
+web: gunicorn djheroku.wsgi --log-file -
+
+worker: python manage.py rqworker default
+```
+
+The `release` line specifies that we want Heroku to run database migrations on
+the app in the app's release phase. See the
+[Heroku documentation](https://devcenter.heroku.com/articles/release-phase)
+for more details.
+
+The `web` process type defines how to run our Django web server. Since we're running
+in production we use `gunicorn` instead of Django's test server that we use in
+Docker. See the
+[Heroku documentation](https://devcenter.heroku.com/articles/getting-started-with-python?singlepage=true#define-a-procfile)
+for more details.
+
+Finally the `worker` process type defines how to run our background task runner.
+Note that the command is exactly the same as the worker service in our Docker
+Compose configuration.
 
 ### Why Deploy to Heroku
 
@@ -271,6 +341,34 @@ heroku ps:scale worker=1
 
 ## Further Reading
 
-* Will Vincent
-* Two Scoops of Django
-* [Getting Started on Heroku with Python](https://devcenter.heroku.com/articles/getting-started-with-python)
+Will Vincent has published many excellent Django tutorials on his websites
+[wsvincent.com](https://wsvincent.com/) and [learndjango.com](https://learndjango.com/).
+I also highly recommend [his books](https://wsvincent.com/books/) for beginner
+and experienced Django developers.
+
+Similar to this tutorial, Will develops a detailed example in his book
+[*Django for Professionals*](https://djangoforprofessionals.com/) on how to
+develop a Django app in Docker and deploy it to Heroku. My tutorial is different
+in that I do not use Pipenv (which seems to have fallen out of fashion since
+*Django for Professionals* was published) and I don't deploy to Heroku's
+alternative Docker runtime environment.
+
+For intermediate to advanced Django developers I highly recommend the book
+[*Two Scoops of Django*](https://www.roygreenfeld.com/collections/two-scoops-press/products/two-scoops-of-django-1-11)
+by Daniel and Audrey Roy Greenfeld.
+The most recent edition covers Django 1.11 (released April, 2017) so it's
+somewhat dated but most of content is still very applicable even if you're
+developing with newer Django releases.
+As of February 2020 Daniel and Audrey are writing a new book, *Django Crash Course*,
+which looks very promising. See [their website](https://www.roygreenfeld.com/collections/two-scoops-press)
+for details.
+
+Vitor Freitas has published a number of very hiqh quality, in depth articles
+about Django development on his website
+[Simple is Better Than Complex](https://simpleisbetterthancomplex.com/).
+
+For the official Heroku Python/Django tutorial read [Getting Started on Heroku with Python](https://devcenter.heroku.com/articles/getting-started-with-python).
+
+Thanks for reading!
+
+John Barham, [Wombat Software](https://www.wombatsoftware.com/)
