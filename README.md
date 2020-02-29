@@ -17,9 +17,9 @@ is configured to run in the Docker development environment.
 
 Please note that this is *not* a general tutorial on Django development or using
 Docker. I assume that you're familiar with Django and are at least aware of
-Docker, and the benefits of containerization more generally, but would benefit
-from seeing a simple but real-world Django application configured for
-development in Docker, and, as a bonus, deployment to Heroku.
+Docker, and the benefits of containerization more generally, but want to learn
+how to configure a simple but real-world Django application for development in
+Docker, and, as a bonus, deployment to Heroku.
 
 ## Contents
 
@@ -34,6 +34,7 @@ development in Docker, and, as a bonus, deployment to Heroku.
   - [Why Deploy to Heroku](#why-deploy-to-heroku)
   - [Why Not Deploy to Heroku](#why-not-deploy-to-heroku)
 - [Further Reading](#further-reading)
+- [Conclusion](#conclusion)
 
 ## Developing in Docker
 
@@ -263,7 +264,7 @@ heroku addons:create heroku-postgresql:hobby-dev
 
 Once Heroku has finished creating the Postgres database, it will create the
 environment variable `DATABASE_URL` which contains the login credentials to the
-database. View the Heroku app's environment by running `heroku config`.
+database. You can view the Heroku app's environment by running `heroku config`.
 
 Create a new Heroku Redis server:
 
@@ -274,7 +275,15 @@ heroku addons:create heroku-redis:hobby-dev
 Similarly Heroku will create an environment variable `REDIS_URL` once it's
 finished creating the Redis instance.
 
-Upload and deploy our app to Heroku:
+Since Heroku is our production environment, for security we should override the
+default Django SECRET_KEY by setting the SECRET_KEY environment variable.
+Copy a generated key from the development app and run:
+
+```
+heroku config:set SECRET_KEY='replace me with a generated secret key'
+```
+
+Time to go live! Upload and deploy our app to Heroku:
 
 ```
 git push heroku master
@@ -298,8 +307,8 @@ Shut down the app in Heroku by running:
 heroku ps:scale web=0 worker=0
 ```
 
-Note that shutting down the app only stops the app's `web` and `worker` dynos.
-The Postgres database and Redis server that we created for the app keep running.
+Free Heroku web dynos will automatically [go to sleep after 30 minutes of inactivity](https://devcenter.heroku.com/articles/free-dyno-hours#dyno-sleeping) but worker dynos will keep running until you
+explicitly shut them down.
 
 To permanently delete the Heroku app, including the Postgres database and Redis
 server, run `heroku apps:destroy`.
@@ -337,7 +346,42 @@ Compose configuration.
 
 ### Why Deploy to Heroku
 
+We've seen above how we can deploy a Django app to Heroku, using Postgres and
+Redis, with a background job runner, by writing a three line `Procfile` config
+file and running `git push heroku master`. That's really as easy as it gets to
+deploy a web app to production.
+
+By comparison
+[this tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04)
+shows how to set up Django with Postgres, Nginx and Gunicorn to run on a
+[Digital Ocean](https://www.digitalocean.com/) virtual machine. It's a clear,
+comprehensive tutorial which I've referenced many times myself. You'll also notice
+that it's very long, with lots of steps, each of which must be completed
+without making a mistake to get your app up and running. If you want to get the
+same app running on a different (e.g., bigger) virtual machine, you'll have to
+repeat the process all over again, or write a script.
+
 ### Why Not Deploy to Heroku
+
+By default Django uses SQLite for its database. SQLite is an excellent option for
+Django sites that are [predominantly
+read-only](https://docs.djangoproject.com/en/dev/ref/databases/#sqlite-notes)
+and will only ever run on a single server. But using SQLite as your database on
+Heroku isn't an option since [Heroku dyno filesystems are
+ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
+
+I run a hobby site, [M43 Lenses](https://www.m43lenses.com/), that gets light
+traffic and is only updated by me so it runs happily on a $5/month Digital Ocean
+VM using SQLite for its database.
+
+Another consequence of the ephemeral nature of the filesystem on Heroku dynos
+is that if you have a site that allows users to upload e.g. image files, you
+will need to configure your app to save those files to an external file storage service
+such as [AWS S3](https://aws.amazon.com/s3/). This is pretty straightforward to
+set up in Django using [django-storages](https://django-storages.readthedocs.io/en/latest/index.html),
+but you may decide that it's more trouble than it's worth to set up on Heroku
+and stick with conventional VM hosting providers like Linode or Digital Ocean
+that provide permanent disk storage with your VM.
 
 ## Further Reading
 
@@ -357,17 +401,33 @@ For intermediate to advanced Django developers I highly recommend the book
 [*Two Scoops of Django*](https://www.roygreenfeld.com/collections/two-scoops-press/products/two-scoops-of-django-1-11)
 by Daniel and Audrey Roy Greenfeld.
 The most recent edition covers Django 1.11 (released April, 2017) so it's
-somewhat dated but most of content is still very applicable even if you're
+somewhat dated but most of the content is still very applicable even if you're
 developing with newer Django releases.
 As of February 2020 Daniel and Audrey are writing a new book, *Django Crash Course*,
 which looks very promising. See [their website](https://www.roygreenfeld.com/collections/two-scoops-press)
 for details.
 
-Vitor Freitas has published a number of very hiqh quality, in depth articles
+Vitor Freitas has published a number of very hiqh quality, in-depth articles
 about Django development on his website
 [Simple is Better Than Complex](https://simpleisbetterthancomplex.com/).
 
 For the official Heroku Python/Django tutorial read [Getting Started on Heroku with Python](https://devcenter.heroku.com/articles/getting-started-with-python).
+
+[The Twelve-Factor App website](https://12factor.net/) lists best practices for
+developing and deploying software-as-a-service web apps. The 12 factors were
+formulated by Adam Wiggins, one of the cofounders of Heroku.
+
+## Conclusion
+
+If you've got this far, congratulations! My goal in writing this tutorial was
+to present some of the knowledge that I've learned by trial and error developing
+Django web apps in Docker and deploying them to Heroku. Your particular context
+will be different from mine, but I hope that this tutorial is a useful starting
+point to make you more productive developing your own Django apps.
+
+Please feel free to email me at [john@wombatsoftware.com](mailto:john@wombatsoftware.com)
+if you have any comments or questions about this tutorial.
+I also do Django consulting through my company, [Wombat Software](https://www.wombatsoftware.com/).
 
 Thanks for reading!
 
