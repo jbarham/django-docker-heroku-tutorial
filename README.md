@@ -48,9 +48,9 @@ Prerequisites:
 
 Download the tutorial code into a new directory:
 
-```
-git clone git@github.com:jbarham/django-docker-heroku-tutorial.git djheroku
-cd djheroku
+```sh
+$ git clone https://github.com/jbarham/django-docker-heroku-tutorial.git djheroku
+$ cd djheroku
 ```
 
 Run `docker-compose up -d --build` to download the Docker images and bring
@@ -64,14 +64,14 @@ services running Postgres and Redis, and a separate background task runner.
 
 However, the Postgres database will be empty. Populate it by running:
 
-```
-docker-compose exec web python manage.py migrate
+```sh
+$ docker-compose exec web python manage.py migrate
 ```
 
 The above command runs the command `python manage.py migrate` in the Django
 Docker container. You could accomplish the same by running:
 
-```
+```sh
 $ docker-compose exec web bash
 # python manage.py migrate
 # exit
@@ -258,8 +258,8 @@ Run `heroku create` to create a new Heroku app with a randomly generated name.
 
 Create a new Heroku Postgres database:
 
-```
-heroku addons:create heroku-postgresql:hobby-dev
+```sh
+$ heroku addons:create heroku-postgresql:hobby-dev
 ```
 
 Once Heroku has finished creating the Postgres database, it will create the
@@ -268,8 +268,8 @@ database. You can view the Heroku app's environment by running `heroku config`.
 
 Create a new Heroku Redis server:
 
-```
-heroku addons:create heroku-redis:hobby-dev
+```sh
+$ heroku addons:create heroku-redis:hobby-dev
 ```
 
 Similarly Heroku will create an environment variable `REDIS_URL` once it's
@@ -279,14 +279,14 @@ Since Heroku is our production environment, for security we should override the
 default Django SECRET_KEY by setting the SECRET_KEY environment variable.
 Copy a generated key from the development app and run:
 
-```
-heroku config:set SECRET_KEY='replace me with a generated secret key'
+```sh
+$ heroku config:set SECRET_KEY='replace me with a generated secret key'
 ```
 
 Time to go live! Upload and deploy our app to Heroku:
 
-```
-git push heroku master
+```sh
+$ git push heroku master
 ```
 
 This will take some time as Heroku builds the app and deploys it to a web dyno,
@@ -297,14 +297,14 @@ You should now able to view the Django app running in Heroku by running
 
 The background task runner isn't run by default so spin one up:
 
-```
-heroku ps:scale worker=1
+```sh
+$ heroku ps:scale worker=1
 ```
 
 Shut down the app in Heroku by running:
 
-```
-heroku ps:scale web=0 worker=0
+```sh
+$ heroku ps:scale web=0 worker=0
 ```
 
 Free Heroku web dynos will automatically [go to sleep after 30 minutes of inactivity](https://devcenter.heroku.com/articles/free-dyno-hours#dyno-sleeping) but worker dynos will keep running until you
