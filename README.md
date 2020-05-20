@@ -397,15 +397,9 @@ in that I do not use Pipenv (which seems to have fallen out of fashion since
 *Django for Professionals* was published) and I don't deploy to Heroku's
 alternative Docker runtime environment.
 
-For intermediate to advanced Django developers I highly recommend the book
-[*Two Scoops of Django*](https://www.roygreenfeld.com/collections/two-scoops-press/products/two-scoops-of-django-1-11)
-by Daniel and Audrey Roy Greenfeld.
-The most recent edition covers Django 1.11 (released April, 2017) so it's
-somewhat dated but most of the content is still very applicable even if you're
-developing with newer Django releases.
-As of February 2020 Daniel and Audrey are writing a new book, *Django Crash Course*,
-which looks very promising. See [their website](https://www.roygreenfeld.com/collections/two-scoops-press)
-for details.
+For intermediate to advanced Django developers I highly recommend the
+[*Two Scoops of Django*](https://www.feldroy.com/collections/two-scoops-press)
+series by Daniel and Audrey Feldroy (formerly Daniel and Audrey Roy Greenfeld).
 
 Vitor Freitas has published a number of very hiqh quality, in-depth articles
 about Django development on his website
