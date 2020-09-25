@@ -385,9 +385,9 @@ that provide permanent disk storage with your VM.
 
 ## Further Reading
 
-Will Vincent has published many excellent Django tutorials on his websites
-[wsvincent.com](https://wsvincent.com/) and [learndjango.com](https://learndjango.com/).
-I also highly recommend [his books](https://wsvincent.com/books/) for beginner
+[Will Vincent](https://wsvincent.com/) has published many excellent Django
+tutorials on his website [LearnDjango.com](https://learndjango.com/).
+I also highly recommend [his books](https://learndjango.com/books/) for beginner
 and experienced Django developers.
 
 Similar to this tutorial, Will develops a detailed example in his book
