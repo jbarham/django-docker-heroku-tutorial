@@ -1,2 +1,1 @@
-# https://devcenter.heroku.com/articles/python-runtimes
 python-3.9.9
