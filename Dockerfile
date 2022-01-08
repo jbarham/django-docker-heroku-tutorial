@@ -1,5 +1,5 @@
 # Pull base image
-FROM python:3.6-slim
+FROM python:3.9-slim-buster
 
 # Install psql so that "python manage.py dbshell" works
 RUN apt-get update -qq && apt-get install -y postgresql-client
@@ -14,6 +14,3 @@ WORKDIR /app
 # Install dependencies
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
-
-# Copy project
-COPY . /app/

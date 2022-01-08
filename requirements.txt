@@ -1,4 +1,4 @@
-Django>=2.2,<2.3 # Install latest bugfix release of Django 2.2
+Django~=3.2 # Install latest bugfix release of Django 3.2
 psycopg2-binary
 dj-database-url
 django-redis-cache
